@@ -45,7 +45,7 @@ defmodule ExpencfyWeb.ExpenseLive.Show do
     socket =
       socket
       |> assign(:page_title, "Show Expense")
-      |> assign(:expense, Expenses.get_expense!(id))
+      |> assign(:expense, Expenses.get_expense_with_category!(id))
       |> assign(:return_to, return_to)
 
     {:ok, socket}

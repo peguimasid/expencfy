@@ -6,7 +6,7 @@ defmodule Expencfy.Expenses do
   import Ecto.Query, warn: false
   alias Expencfy.Repo
 
-  alias Expencfy.Expenses.Category
+  alias Expencfy.Expenses.{Expense, Category}
 
   @doc """
   Returns the list of categories.
@@ -140,8 +140,6 @@ defmodule Expencfy.Expenses do
     Category.changeset(category, attrs)
   end
 
-  alias Expencfy.Expenses.Expense
-
   @doc """
   Returns the list of expenses.
 
@@ -171,7 +169,23 @@ defmodule Expencfy.Expenses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_expense!(id) do
+  def get_expense!(id), do: Repo.get!(Expense, id)
+
+  @doc """
+  Gets a single expense with its associated category.
+
+  Raises `Ecto.NoResultsError` if the Expense does not exist.
+
+  ## Examples
+
+      iex> get_expense_with_category!(123)
+      %Expense{category: %Category{}}
+
+      iex> get_expense_with_category!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_expense_with_category!(id) do
     Expense
     |> Repo.get!(id)
     |> Repo.preload(:category)

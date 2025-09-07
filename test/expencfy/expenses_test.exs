@@ -26,7 +26,7 @@ defmodule Expencfy.ExpensesTest do
       assert {:ok, %Category{} = category} = Expenses.create_category(valid_attrs)
       assert category.name == "some name"
       assert category.description == "some description"
-      assert category.monthly_budget == 42
+      assert category.monthly_budget == %Money{currency: :USD, amount: 42}
     end
 
     test "create_category/1 with invalid data returns error changeset" do
@@ -45,7 +45,7 @@ defmodule Expencfy.ExpensesTest do
       assert {:ok, %Category{} = category} = Expenses.update_category(category, update_attrs)
       assert category.name == "some updated name"
       assert category.description == "some updated description"
-      assert category.monthly_budget == 43
+      assert category.monthly_budget == %Money{currency: :USD, amount: 43}
     end
 
     test "update_category/2 with invalid data returns error changeset" do
@@ -97,7 +97,7 @@ defmodule Expencfy.ExpensesTest do
       assert {:ok, %Expense{} = expense} = Expenses.create_expense(valid_attrs)
       assert expense.date == ~D[2025-09-06]
       assert expense.description == "some description"
-      assert expense.amount == 42
+      assert expense.amount == %Money{currency: :USD, amount: 42}
       assert expense.notes == "some notes"
     end
 
@@ -118,7 +118,7 @@ defmodule Expencfy.ExpensesTest do
       assert {:ok, %Expense{} = expense} = Expenses.update_expense(expense, update_attrs)
       assert expense.date == ~D[2025-09-07]
       assert expense.description == "some updated description"
-      assert expense.amount == 43
+      assert expense.amount == %Money{currency: :USD, amount: 43}
       assert expense.notes == "some updated notes"
     end
 
