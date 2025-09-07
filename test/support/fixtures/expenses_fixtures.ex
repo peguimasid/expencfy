@@ -12,7 +12,7 @@ defmodule Expencfy.ExpensesFixtures do
       attrs
       |> Enum.into(%{
         description: "some description",
-        monthly_budget: 42,
+        monthly_budget: 4200,
         name: "some name"
       })
       |> Expencfy.Expenses.create_category()
@@ -29,7 +29,7 @@ defmodule Expencfy.ExpensesFixtures do
     {:ok, expense} =
       attrs
       |> Enum.into(%{
-        amount: 42,
+        amount: 4200,
         date: ~D[2025-09-06],
         description: "some description",
         notes: "some notes",

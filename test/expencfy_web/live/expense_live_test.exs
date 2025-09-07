@@ -4,8 +4,18 @@ defmodule ExpencfyWeb.ExpenseLiveTest do
   import Phoenix.LiveViewTest
   import Expencfy.ExpensesFixtures
 
-  @create_attrs %{date: "2025-09-06", description: "some description", amount: 42, notes: "some notes"}
-  @update_attrs %{date: "2025-09-07", description: "some updated description", amount: 43, notes: "some updated notes"}
+  @create_attrs %{
+    date: "2025-09-06",
+    description: "some description",
+    amount: 4200,
+    notes: "some notes"
+  }
+  @update_attrs %{
+    date: "2025-09-07",
+    description: "some updated description",
+    amount: 4300,
+    notes: "some updated notes"
+  }
   @invalid_attrs %{date: nil, description: nil, amount: nil, notes: nil}
   defp create_expense(_) do
     expense = expense_fixture()
@@ -81,6 +91,20 @@ defmodule ExpencfyWeb.ExpenseLiveTest do
       assert index_live |> element("#expenses-#{expense.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#expenses-#{expense.id}")
     end
+
+    test "displays formatted date correctly", %{conn: conn, expense: expense} do
+      {:ok, _show_live, html} = live(conn, ~p"/expenses/#{expense}")
+
+      formatted_date = Timex.format!(expense.date, "{0M}/{0D}/{YYYY}")
+      assert html =~ formatted_date
+    end
+
+    test "displays formatted currency in listing", %{conn: conn, expense: expense} do
+      {:ok, _index_live, html} = live(conn, ~p"/expenses")
+
+      expected_amount = Money.to_string(expense.amount)
+      assert html =~ expected_amount
+    end
   end
 
   describe "Show" do
@@ -117,6 +141,13 @@ defmodule ExpencfyWeb.ExpenseLiveTest do
       html = render(show_live)
       assert html =~ "Expense updated successfully"
       assert html =~ "some updated description"
+    end
+
+    test "displays formatted currency in listing", %{conn: conn, expense: expense} do
+      {:ok, _index_live, html} = live(conn, ~p"/expenses")
+
+      expected_amount = Money.to_string(expense.amount)
+      assert html =~ expected_amount
     end
   end
 end
