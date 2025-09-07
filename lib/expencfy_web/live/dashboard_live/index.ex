@@ -19,11 +19,11 @@ defmodule ExpencfyWeb.DashboardLive.Index do
         </p>
 
         <div class="mt-8 flex space-x-4">
-          <a href={~p"/categories"} class="btn btn-primary">
-            Manage Categories
-          </a>
-          <a href={~p"/expenses"} class="btn btn-secondary">
+          <.button href={~p"/expenses"} class="btn btn-primary">
             Manage Expenses
+          </.button>
+          <a href={~p"/categories"} class="btn btn-ghost">
+            Manage Categories
           </a>
         </div>
       </div>
