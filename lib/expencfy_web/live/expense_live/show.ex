@@ -24,6 +24,14 @@ defmodule ExpencfyWeb.ExpenseLive.Show do
         <:item title="Description">{@expense.description}</:item>
         <:item title="Amount">{@expense.amount}</:item>
         <:item title="Date">{@expense.date}</:item>
+        <:item title="Category">
+          <.link
+            navigate={~p"/categories/#{@expense.category}?return_to=/expenses/#{@expense}"}
+            class="text-blue-600 hover:text-blue-800 underline"
+          >
+            {@expense.category.name}
+          </.link>
+        </:item>
         <:item title="Notes">{@expense.notes}</:item>
       </.list>
     </Layouts.app>

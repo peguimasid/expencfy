@@ -40,6 +40,26 @@ defmodule Expencfy.Expenses do
   def get_category!(id), do: Repo.get!(Category, id)
 
   @doc """
+  Gets a single category with its associated expenses.
+
+  Raises `Ecto.NoResultsError` if the Category does not exist.
+
+  ## Examples
+
+      iex> get_category_with_expenses!(123)
+      %Category{expenses: [%Expense{}, ...]}
+
+      iex> get_category_with_expenses!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_category_with_expenses!(id) do
+    Category
+    |> Repo.get!(id)
+    |> Repo.preload(:expenses)
+  end
+
+  @doc """
   Returns a list of category names and their IDs.
   This is useful for populating a dropdown or select input in a form.
   The returned list will be in the format:
@@ -151,7 +171,11 @@ defmodule Expencfy.Expenses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_expense!(id), do: Repo.get!(Expense, id)
+  def get_expense!(id) do
+    Expense
+    |> Repo.get!(id)
+    |> Repo.preload(:category)
+  end
 
   @doc """
   Creates a expense.

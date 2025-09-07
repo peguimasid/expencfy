@@ -11,7 +11,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         Category {@category.id}
         <:subtitle>This is a category record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/categories"}>
+          <.button navigate={@return_to}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/categories/#{@category}/edit?return_to=show"}>
@@ -25,15 +25,39 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         <:item title="Description">{@category.description}</:item>
         <:item title="Monthly budget">{@category.monthly_budget}</:item>
       </.list>
+
+      <hr />
+
+      <.header>
+        Recent Expenses
+      </.header>
+
+      <div :if={Enum.empty?(@category.expenses)} class="text-gray-500 italic">
+        No expenses found for this category.
+      </div>
+
+      <.table :if={not Enum.empty?(@category.expenses)} id="expenses" rows={@category.expenses}>
+        <:col :let={expense} label="Description">{expense.description}</:col>
+        <:col :let={expense} label="Amount">${expense.amount}</:col>
+        <:col :let={expense} label="Date">{expense.date}</:col>
+        <:action :let={expense}>
+          <.link navigate={~p"/expenses/#{expense}"}>Show</.link>
+        </:action>
+      </.table>
     </Layouts.app>
     """
   end
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Show Category")
-     |> assign(:category, Expenses.get_category!(id))}
+  def mount(%{"id" => id} = params, _session, socket) do
+    return_to = Map.get(params, "return_to", ~p"/categories")
+
+    socket =
+      socket
+      |> assign(:page_title, "Show Category")
+      |> assign(:category, Expenses.get_category_with_expenses!(id))
+      |> assign(:return_to, return_to)
+
+    {:ok, socket}
   end
 end
