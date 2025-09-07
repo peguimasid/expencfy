@@ -7,7 +7,7 @@ defmodule Expencfy.Expenses.Expense do
     field :amount, :integer
     field :date, :date
     field :notes, :string
-    field :category_id, :id
+    belongs_to :category, Expencfy.Expenses.Category
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +15,7 @@ defmodule Expencfy.Expenses.Expense do
   @doc false
   def changeset(expense, attrs) do
     expense
-    |> cast(attrs, [:description, :amount, :date, :notes])
-    |> validate_required([:description, :amount, :date, :notes])
+    |> cast(attrs, [:description, :amount, :date, :notes, :category_id])
+    |> validate_required([:description, :amount, :date, :category_id])
   end
 end

@@ -7,6 +7,8 @@ defmodule Expencfy.Expenses.Category do
     field :description, :string
     field :monthly_budget, :integer
 
+    has_many :expenses, Expencfy.Expenses.Expense
+
     timestamps(type: :utc_datetime)
   end
 

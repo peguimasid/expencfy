@@ -18,6 +18,12 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:date]} type="date" label="Date" />
         <.input field={@form[:notes]} type="textarea" label="Notes" />
+        <.input
+          field={@form[:category_id]}
+          type="select"
+          label="Category"
+          options={@category_options}
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Expense</.button>
           <.button navigate={return_path(@return_to, @expense)}>Cancel</.button>
@@ -32,6 +38,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
+     |> assign(:category_options, Expenses.category_names_and_ids())
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -71,7 +78,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
       {:ok, expense} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Expense updated successfully")
+         |> put_flash(:success, "Expense updated successfully")
          |> push_navigate(to: return_path(socket.assigns.return_to, expense))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -84,7 +91,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
       {:ok, expense} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Expense created successfully")
+         |> put_flash(:success, "Expense created successfully")
          |> push_navigate(to: return_path(socket.assigns.return_to, expense))}
 
       {:error, %Ecto.Changeset{} = changeset} ->

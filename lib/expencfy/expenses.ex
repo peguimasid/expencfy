@@ -18,7 +18,9 @@ defmodule Expencfy.Expenses do
 
   """
   def list_categories do
-    Repo.all(Category)
+    Category
+    |> order_by(desc: :updated_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -36,6 +38,22 @@ defmodule Expencfy.Expenses do
 
   """
   def get_category!(id), do: Repo.get!(Category, id)
+
+  @doc """
+  Returns a list of category names and their IDs.
+  This is useful for populating a dropdown or select input in a form.
+  The returned list will be in the format:
+  [
+    {category_name, category_id},
+    ...
+  ]
+  """
+  def category_names_and_ids do
+    Category
+    |> select([c], {c.name, c.id})
+    |> order_by([c], asc: c.name)
+    |> Repo.all()
+  end
 
   @doc """
   Creates a category.
@@ -114,7 +132,9 @@ defmodule Expencfy.Expenses do
 
   """
   def list_expenses do
-    Repo.all(Expense)
+    Expense
+    |> order_by(desc: :updated_at)
+    |> Repo.all()
   end
 
   @doc """
