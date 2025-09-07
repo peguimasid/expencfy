@@ -4,7 +4,7 @@ defmodule Expencfy.Expenses.Expense do
 
   schema "expenses" do
     field :description, :string
-    field :amount, :integer
+    field :amount, Money.Ecto.Amount.Type
     field :date, :date
     field :notes, :string
     belongs_to :category, Expencfy.Expenses.Category

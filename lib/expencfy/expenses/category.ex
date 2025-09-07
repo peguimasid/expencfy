@@ -5,7 +5,7 @@ defmodule Expencfy.Expenses.Category do
   schema "categories" do
     field :name, :string
     field :description, :string
-    field :monthly_budget, :integer
+    field :monthly_budget, Money.Ecto.Amount.Type
 
     has_many :expenses, Expencfy.Expenses.Expense
 
