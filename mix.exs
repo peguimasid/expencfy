@@ -11,7 +11,8 @@ defmodule Expencfy.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      preferred_cli_env: ["test.watch": :test]
     ]
   end
 
@@ -67,7 +68,8 @@ defmodule Expencfy.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:money, "~> 1.14"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

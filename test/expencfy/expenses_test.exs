@@ -20,6 +20,27 @@ defmodule Expencfy.ExpensesTest do
       assert Expenses.get_category!(category.id) == category
     end
 
+    test "get_category_with_expenses!/1 returns the category with preloaded expenses" do
+      category = category_fixture()
+      expense = expense_fixture(%{category_id: category.id})
+      category_with_expenses = Expenses.get_category_with_expenses!(category.id)
+      assert category_with_expenses.id == category.id
+      assert category_with_expenses.expenses == [expense]
+    end
+
+    test "get_category_with_expenses!/1 raises Ecto.NoResultsError for non-existent id" do
+      assert_raise Ecto.NoResultsError, fn -> Expenses.get_category_with_expenses!(999) end
+    end
+
+    test "category_names_and_ids/0 returns list of category names and ids" do
+      category1 = category_fixture(%{name: "Category A"})
+      category2 = category_fixture(%{name: "Category B"})
+      names_and_ids = Expenses.category_names_and_ids()
+      assert {"Category A", category1.id} in names_and_ids
+      assert {"Category B", category2.id} in names_and_ids
+      assert length(names_and_ids) == 2
+    end
+
     test "create_category/1 with valid data creates a category" do
       valid_attrs = %{name: "some name", description: "some description", monthly_budget: 42}
 
@@ -81,6 +102,18 @@ defmodule Expencfy.ExpensesTest do
     test "get_expense!/1 returns the expense with given id" do
       expense = expense_fixture()
       assert Expenses.get_expense!(expense.id) == expense
+    end
+
+    test "get_expense_with_category!/1 returns the expense with preloaded category" do
+      category = category_fixture()
+      expense = expense_fixture(%{category_id: category.id})
+      expense_with_category = Expenses.get_expense_with_category!(expense.id)
+      assert expense_with_category.id == expense.id
+      assert expense_with_category.category == category
+    end
+
+    test "get_expense_with_category!/1 raises Ecto.NoResultsError for non-existent id" do
+      assert_raise Ecto.NoResultsError, fn -> Expenses.get_expense_with_category!(999) end
     end
 
     test "create_expense/1 with valid data creates a expense" do
