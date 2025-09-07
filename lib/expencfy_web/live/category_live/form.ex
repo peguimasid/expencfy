@@ -83,7 +83,7 @@ defmodule ExpencfyWeb.CategoryLive.Form do
       {:ok, category} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Category created successfully")
+         |> put_flash(:success, "Category created successfully")
          |> push_navigate(to: return_path(socket.assigns.return_to, category))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
