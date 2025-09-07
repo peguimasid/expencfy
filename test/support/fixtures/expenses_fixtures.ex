@@ -19,4 +19,21 @@ defmodule Expencfy.ExpensesFixtures do
 
     category
   end
+
+  @doc """
+  Generate a expense.
+  """
+  def expense_fixture(attrs \\ %{}) do
+    {:ok, expense} =
+      attrs
+      |> Enum.into(%{
+        amount: 42,
+        date: ~D[2025-09-06],
+        description: "some description",
+        notes: "some notes"
+      })
+      |> Expencfy.Expenses.create_expense()
+
+    expense
+  end
 end
