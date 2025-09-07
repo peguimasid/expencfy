@@ -16,7 +16,12 @@ defmodule ExpencfyWeb.CategoryLive.Form do
       <.form for={@form} id="category-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:description]} type="textarea" label="Description" />
-        <.input field={@form[:monthly_budget]} type="number" label="Monthly budget" />
+        <.input
+          field={@form[:monthly_budget]}
+          value={money_to_decimal(Phoenix.HTML.Form.input_value(@form, :monthly_budget))}
+          type="number"
+          label="Monthly budget"
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Category</.button>
           <.button navigate={return_path(@return_to, @category)}>Cancel</.button>
@@ -93,4 +98,11 @@ defmodule ExpencfyWeb.CategoryLive.Form do
 
   defp return_path("index", _category), do: ~p"/categories"
   defp return_path("show", category), do: ~p"/categories/#{category}"
+
+  defp money_to_decimal(input_value) do
+    case input_value do
+      %Money{} -> Money.to_decimal(input_value)
+      _ -> input_value
+    end
+  end
 end

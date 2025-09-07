@@ -15,7 +15,12 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
 
       <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:amount]} type="number" label="Amount" />
+        <.input
+          field={@form[:amount]}
+          value={money_to_decimal(Phoenix.HTML.Form.input_value(@form, :amount))}
+          type="number"
+          label="Amount"
+        />
         <.input field={@form[:date]} type="date" label="Date" />
         <.input field={@form[:notes]} type="textarea" label="Notes" />
         <.input
@@ -47,6 +52,8 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     expense = Expenses.get_expense!(id)
+
+    IO.inspect(expense)
 
     socket
     |> assign(:page_title, "Edit Expense")
@@ -101,4 +108,11 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
 
   defp return_path("index", _expense), do: ~p"/expenses"
   defp return_path("show", expense), do: ~p"/expenses/#{expense}"
+
+  defp money_to_decimal(input_value) do
+    case input_value do
+      %Money{} -> Money.to_decimal(input_value)
+      _ -> input_value
+    end
+  end
 end
