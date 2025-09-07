@@ -23,7 +23,7 @@ defmodule ExpencfyWeb.ExpenseLive.Show do
       <.list>
         <:item title="Description">{@expense.description}</:item>
         <:item title="Amount">{@expense.amount}</:item>
-        <:item title="Date">{@expense.date}</:item>
+        <:item title="Date">{Timex.format!(@expense.date, "{0M}/{0D}/{YYYY}")}</:item>
         <:item title="Category">
           <.link
             navigate={~p"/categories/#{@expense.category}?return_to=/expenses/#{@expense}"}

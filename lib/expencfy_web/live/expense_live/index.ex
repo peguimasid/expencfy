@@ -23,7 +23,9 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
       >
         <:col :let={{_id, expense}} label="Description">{expense.description}</:col>
         <:col :let={{_id, expense}} label="Amount">{expense.amount}</:col>
-        <:col :let={{_id, expense}} label="Date">{expense.date}</:col>
+        <:col :let={{_id, expense}} label="Date">
+          {Timex.format!(expense.date, "{0M}/{0D}/{YYYY}")}
+        </:col>
         <:col :let={{_id, expense}} label="Notes">{expense.notes}</:col>
         <:action :let={{_id, expense}}>
           <div class="sr-only">

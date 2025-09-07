@@ -54,7 +54,7 @@ shopping =
 %Expense{
   description: "Grocery shopping",
   amount: 8945,
-  date: ~D[2024-01-14],
+  date: ~D[2025-09-07],
   notes: "Weekly groceries",
   category: food_dining
 }
@@ -63,7 +63,7 @@ shopping =
 %Expense{
   description: "Gas refill",
   amount: 18950,
-  date: ~D[2024-01-12],
+  date: ~D[2025-09-06],
   notes: "Full tank",
   category: transportation
 }
@@ -72,7 +72,7 @@ shopping =
 %Expense{
   description: "Movie night",
   amount: 14599,
-  date: ~D[2024-01-10],
+  date: ~D[2025-09-05],
   notes: "Cinema ticket and snacks",
   category: entertainment
 }
@@ -81,7 +81,7 @@ shopping =
 %Expense{
   description: "Winter jacket",
   amount: 23467,
-  date: ~D[2024-01-08],
+  date: ~D[2025-09-03],
   notes: "Purchased at mall",
   category: shopping
 }
@@ -90,7 +90,7 @@ shopping =
 %Expense{
   description: "Coffee subscription",
   amount: 1299,
-  date: ~D[2024-01-15],
+  date: ~D[2025-08-15],
   notes: "Monthly premium blend",
   category: food_dining
 }
@@ -99,7 +99,7 @@ shopping =
 %Expense{
   description: "Uber ride",
   amount: 1250,
-  date: ~D[2024-01-13],
+  date: ~D[2025-08-13],
   notes: "Airport to downtown",
   category: transportation
 }
@@ -108,7 +108,7 @@ shopping =
 %Expense{
   description: "Netflix subscription",
   amount: 1599,
-  date: ~D[2024-01-11],
+  date: ~D[2025-08-11],
   notes: "Monthly streaming service",
   category: entertainment
 }
@@ -117,7 +117,7 @@ shopping =
 %Expense{
   description: "New headphones",
   amount: 12999,
-  date: ~D[2024-01-09],
+  date: ~D[2025-08-09],
   notes: "Noise-cancelling wireless",
   category: shopping
 }
