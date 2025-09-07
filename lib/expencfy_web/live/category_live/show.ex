@@ -11,7 +11,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         Category {@category.id}
         <:subtitle>This is a category record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/categories"}>
+          <.button navigate={~p"/"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/categories/#{@category}/edit?return_to=show"}>

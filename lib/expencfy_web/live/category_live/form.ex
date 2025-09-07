@@ -91,6 +91,6 @@ defmodule ExpencfyWeb.CategoryLive.Form do
     end
   end
 
-  defp return_path("index", _category), do: ~p"/categories"
+  defp return_path("index", _category), do: ~p"/"
   defp return_path("show", category), do: ~p"/categories/#{category}"
 end
