@@ -21,14 +21,14 @@ defmodule ExpencfyWeb.CategoryLiveTest do
     setup [:create_category]
 
     test "lists all categories", %{conn: conn, category: category} do
-      {:ok, _index_live, html} = live(conn, ~p"/")
+      {:ok, _index_live, html} = live(conn, ~p"/categories")
 
       assert html =~ "Listing Categories"
       assert html =~ category.name
     end
 
     test "saves new category", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/")
+      {:ok, index_live, _html} = live(conn, ~p"/categories")
 
       assert {:ok, form_live, _} =
                index_live
@@ -46,7 +46,7 @@ defmodule ExpencfyWeb.CategoryLiveTest do
                form_live
                |> form("#category-form", category: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/")
+               |> follow_redirect(conn, ~p"/categories")
 
       html = render(index_live)
       assert html =~ "Category created successfully"
@@ -54,7 +54,7 @@ defmodule ExpencfyWeb.CategoryLiveTest do
     end
 
     test "updates category in listing", %{conn: conn, category: category} do
-      {:ok, index_live, _html} = live(conn, ~p"/")
+      {:ok, index_live, _html} = live(conn, ~p"/categories")
 
       assert {:ok, form_live, _html} =
                index_live
@@ -72,7 +72,7 @@ defmodule ExpencfyWeb.CategoryLiveTest do
                form_live
                |> form("#category-form", category: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/")
+               |> follow_redirect(conn, ~p"/categories")
 
       html = render(index_live)
       assert html =~ "Category updated successfully"
@@ -80,7 +80,7 @@ defmodule ExpencfyWeb.CategoryLiveTest do
     end
 
     test "deletes category in listing", %{conn: conn, category: category} do
-      {:ok, index_live, _html} = live(conn, ~p"/")
+      {:ok, index_live, _html} = live(conn, ~p"/categories")
 
       assert index_live |> element("#categories-#{category.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#categories-#{category.id}")
