@@ -19,7 +19,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
           field={@form[:amount]}
           value={money_to_decimal(Phoenix.HTML.Form.input_value(@form, :amount))}
           type="number"
-          label="Amount"
+          label="Amount ($)"
         />
         <.input field={@form[:date]} type="date" label="Date" />
         <.input field={@form[:notes]} type="textarea" label="Notes" />

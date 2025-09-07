@@ -20,7 +20,7 @@ defmodule ExpencfyWeb.CategoryLive.Form do
           field={@form[:monthly_budget]}
           value={money_to_decimal(Phoenix.HTML.Form.input_value(@form, :monthly_budget))}
           type="number"
-          label="Monthly budget"
+          label="Monthly budget ($)"
         />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Category</.button>
