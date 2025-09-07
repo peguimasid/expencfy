@@ -35,7 +35,12 @@ defmodule Expencfy.ExpensesTest do
 
     test "update_category/2 with valid data updates the category" do
       category = category_fixture()
-      update_attrs = %{name: "some updated name", description: "some updated description", monthly_budget: 43}
+
+      update_attrs = %{
+        name: "some updated name",
+        description: "some updated description",
+        monthly_budget: 43
+      }
 
       assert {:ok, %Category{} = category} = Expenses.update_category(category, update_attrs)
       assert category.name == "some updated name"
@@ -79,7 +84,15 @@ defmodule Expencfy.ExpensesTest do
     end
 
     test "create_expense/1 with valid data creates a expense" do
-      valid_attrs = %{date: ~D[2025-09-06], description: "some description", amount: 42, notes: "some notes"}
+      category = category_fixture()
+
+      valid_attrs = %{
+        date: ~D[2025-09-06],
+        description: "some description",
+        amount: 42,
+        notes: "some notes",
+        category_id: category.id
+      }
 
       assert {:ok, %Expense{} = expense} = Expenses.create_expense(valid_attrs)
       assert expense.date == ~D[2025-09-06]
@@ -94,7 +107,13 @@ defmodule Expencfy.ExpensesTest do
 
     test "update_expense/2 with valid data updates the expense" do
       expense = expense_fixture()
-      update_attrs = %{date: ~D[2025-09-07], description: "some updated description", amount: 43, notes: "some updated notes"}
+
+      update_attrs = %{
+        date: ~D[2025-09-07],
+        description: "some updated description",
+        amount: 43,
+        notes: "some updated notes"
+      }
 
       assert {:ok, %Expense{} = expense} = Expenses.update_expense(expense, update_attrs)
       assert expense.date == ~D[2025-09-07]
