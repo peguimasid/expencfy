@@ -38,10 +38,10 @@ defmodule ExpencfyWeb.CategoryLive.Show do
 
       <.table :if={not Enum.empty?(@category.expenses)} id="expenses" rows={@category.expenses}>
         <:col :let={expense} label="Description">{expense.description}</:col>
-        <:col :let={expense} label="Amount">${expense.amount}</:col>
+        <:col :let={expense} label="Amount">{expense.amount}</:col>
         <:col :let={expense} label="Date">{expense.date}</:col>
         <:action :let={expense}>
-          <.link navigate={~p"/expenses/#{expense}"}>Show</.link>
+          <.link navigate={~p"/expenses/#{expense}?return_to=/categories/#{@category}"}>Show</.link>
         </:action>
       </.table>
     </Layouts.app>
