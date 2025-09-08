@@ -26,9 +26,18 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         <:item title="Monthly budget">{@category.monthly_budget}</:item>
         <:item title="Total spent">{@total_spent}</:item>
         <:item title="Percent of budget spent">
-          <div class="flex gap-4 items-center">
-            <progress class="progress w-56" value={@percent_spent} max="100"></progress>
-            {@percent_spent}%
+          <div class="flex gap-4 items-center mt-2">
+            <progress
+              value={@percent_spent}
+              max="100"
+              class={[
+                "progress w-full",
+                @percent_spent >= 100 && "text-red-500"
+              ]}
+            />
+            <span class="shrink-0">
+              {@percent_spent}%
+            </span>
           </div>
         </:item>
       </.list>
