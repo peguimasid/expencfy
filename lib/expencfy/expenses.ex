@@ -8,6 +8,9 @@ defmodule Expencfy.Expenses do
 
   alias Expencfy.Expenses.{Expense, Category}
 
+  @expense_topic "expenses:updates"
+  @category_topic "categories:updates"
+
   @doc """
   Returns the list of categories.
 
@@ -91,6 +94,14 @@ defmodule Expencfy.Expenses do
     %Category{}
     |> Category.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, category} = result ->
+        broadcast_category_change({:category_created, category})
+        result
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -109,6 +120,14 @@ defmodule Expencfy.Expenses do
     category
     |> Category.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, category} = result ->
+        broadcast_category_change({:category_updated, category})
+        result
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -124,7 +143,14 @@ defmodule Expencfy.Expenses do
 
   """
   def delete_category(%Category{} = category) do
-    Repo.delete(category)
+    case Repo.delete(category) do
+      {:ok, category} = result ->
+        broadcast_category_change({:category_deleted, category})
+        result
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -207,6 +233,15 @@ defmodule Expencfy.Expenses do
     %Expense{}
     |> Expense.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, expense} ->
+        expense_with_category = Repo.preload(expense, :category)
+        broadcast_expense_change({:expense_created, expense_with_category})
+        {:ok, expense_with_category}
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -225,6 +260,15 @@ defmodule Expencfy.Expenses do
     expense
     |> Expense.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, expense} ->
+        expense_with_category = Repo.preload(expense, :category)
+        broadcast_expense_change({:expense_updated, expense_with_category})
+        {:ok, expense_with_category}
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -240,7 +284,14 @@ defmodule Expencfy.Expenses do
 
   """
   def delete_expense(%Expense{} = expense) do
-    Repo.delete(expense)
+    case Repo.delete(expense) do
+      {:ok, expense} = result ->
+        broadcast_expense_change({:expense_deleted, expense})
+        result
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -254,5 +305,39 @@ defmodule Expencfy.Expenses do
   """
   def change_expense(%Expense{} = expense, attrs \\ %{}) do
     Expense.changeset(expense, attrs)
+  end
+
+  # PubSub functions
+
+  @doc """
+  Subscribes to expense updates.
+
+  ## Examples
+
+      iex> Expenses.subscribe()
+      :ok
+  """
+  def subscribe do
+    Phoenix.PubSub.subscribe(Expencfy.PubSub, @expense_topic)
+  end
+
+  @doc """
+  Subscribes to category updates.
+
+  ## Examples
+
+      iex> Expenses.subscribe_to_categories()
+      :ok
+  """
+  def subscribe_to_categories do
+    Phoenix.PubSub.subscribe(Expencfy.PubSub, @category_topic)
+  end
+
+  defp broadcast_expense_change(message) do
+    Phoenix.PubSub.broadcast(Expencfy.PubSub, @expense_topic, message)
+  end
+
+  defp broadcast_category_change(message) do
+    Phoenix.PubSub.broadcast(Expencfy.PubSub, @category_topic, message)
   end
 end
