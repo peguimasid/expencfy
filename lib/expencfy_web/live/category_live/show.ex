@@ -24,19 +24,24 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         <:item title="Name">{@category.name}</:item>
         <:item title="Description">{@category.description}</:item>
         <:item title="Monthly budget">{@category.monthly_budget}</:item>
+        <:item title="Total spent">{@total_spent}</:item>
+        <:item title="Percent of budget spent">
+          <div class="flex gap-4 items-center">
+            <progress class="progress w-56" value={@percent_spent} max="100"></progress>
+            {@percent_spent}%
+          </div>
+        </:item>
       </.list>
 
       <hr />
 
-      <.header>
-        Recent Expenses
-      </.header>
+      <.header>Recent Expenses</.header>
 
-      <div :if={Enum.empty?(@category.expenses)} class="text-gray-500 italic">
+      <div :if={@category.expenses == []} class="text-gray-500 italic">
         No expenses found for this category.
       </div>
 
-      <.table :if={not Enum.empty?(@category.expenses)} id="expenses" rows={@category.expenses}>
+      <.table :if={@category.expenses != []} id="expenses" rows={@category.expenses}>
         <:col :let={expense} label="Description">{expense.description}</:col>
         <:col :let={expense} label="Amount">{expense.amount}</:col>
         <:col :let={expense} label="Date">{expense.date}</:col>
@@ -50,11 +55,28 @@ defmodule ExpencfyWeb.CategoryLive.Show do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    category = Expenses.get_category_with_expenses!(id)
+    total_spent = Enum.reduce(category.expenses, Money.new(0, :USD), &Money.add(&2, &1.amount))
+    percent_spent = calculate_percent_spent(total_spent, category.monthly_budget)
+
     socket =
-      socket
-      |> assign(:page_title, "Show Category")
-      |> assign(:category, Expenses.get_category_with_expenses!(id))
+      assign(socket, %{
+        page_title: "Show Category",
+        category: category,
+        total_spent: total_spent,
+        percent_spent: percent_spent
+      })
 
     {:ok, socket}
+  end
+
+  defp calculate_percent_spent(total_spent, monthly_budget) do
+    budget_amount = monthly_budget |> Money.to_decimal() |> Decimal.to_float()
+    total_spent = total_spent |> Money.to_decimal() |> Decimal.to_float()
+
+    case budget_amount do
+      amount when amount > 0 -> (total_spent / amount * 100) |> Float.round(1)
+      _ -> 0.0
+    end
   end
 end
