@@ -234,10 +234,9 @@ defmodule Expencfy.Expenses do
     |> Expense.changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, expense} ->
-        expense_with_category = Repo.preload(expense, :category)
-        broadcast_expense_change({:expense_created, expense_with_category})
-        {:ok, expense_with_category}
+      {:ok, expense} = result ->
+        broadcast_expense_change({:expense_created, expense})
+        result
 
       error ->
         error
