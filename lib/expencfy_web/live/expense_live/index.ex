@@ -48,6 +48,10 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Expenses.subscribe()
+    end
+
     {:ok,
      socket
      |> assign(:page_title, "Listing Expenses")
@@ -55,11 +59,25 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
   end
 
   @impl true
+  def handle_info({:expense_created, expense}, socket) do
+    {:noreply, stream_insert(socket, :expenses, expense, at: 0)}
+  end
+
+  @impl true
+  def handle_info({:expense_updated, expense}, socket) do
+    {:noreply, stream_insert(socket, :expenses, expense)}
+  end
+
+  @impl true
+  def handle_info({:expense_deleted, expense}, socket) do
+    {:noreply, stream_delete(socket, :expenses, expense)}
+  end
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     expense = Expenses.get_expense!(id)
     {:ok, _} = Expenses.delete_expense(expense)
-
-    {:noreply, stream_delete(socket, :expenses, expense)}
+    {:noreply, socket}
   end
 
   defp list_expenses() do
