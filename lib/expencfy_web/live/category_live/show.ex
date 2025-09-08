@@ -11,7 +11,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         Category {@category.id}
         <:subtitle>This is a category record from your database.</:subtitle>
         <:actions>
-          <.button navigate={@return_to}>
+          <.button navigate={~p"/categories"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/categories/#{@category}/edit?return_to=show"}>
@@ -41,7 +41,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
         <:col :let={expense} label="Amount">{expense.amount}</:col>
         <:col :let={expense} label="Date">{expense.date}</:col>
         <:action :let={expense}>
-          <.link navigate={~p"/expenses/#{expense}?return_to=/categories/#{@category}"}>Show</.link>
+          <.link navigate={~p"/expenses/#{expense}"}>Show</.link>
         </:action>
       </.table>
     </Layouts.app>
@@ -49,14 +49,11 @@ defmodule ExpencfyWeb.CategoryLive.Show do
   end
 
   @impl true
-  def mount(%{"id" => id} = params, _session, socket) do
-    return_to = Map.get(params, "return_to", ~p"/categories")
-
+  def mount(%{"id" => id}, _session, socket) do
     socket =
       socket
       |> assign(:page_title, "Show Category")
       |> assign(:category, Expenses.get_category_with_expenses!(id))
-      |> assign(:return_to, return_to)
 
     {:ok, socket}
   end

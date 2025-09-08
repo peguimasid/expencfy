@@ -11,7 +11,7 @@ defmodule ExpencfyWeb.ExpenseLive.Show do
         Expense {@expense.id}
         <:subtitle>This is a expense record from your database.</:subtitle>
         <:actions>
-          <.button navigate={@return_to}>
+          <.button navigate={~p"/expenses"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/expenses/#{@expense}/edit?return_to=show"}>
@@ -39,14 +39,11 @@ defmodule ExpencfyWeb.ExpenseLive.Show do
   end
 
   @impl true
-  def mount(%{"id" => id} = params, _session, socket) do
-    return_to = Map.get(params, "return_to", ~p"/expenses")
-
+  def mount(%{"id" => id}, _session, socket) do
     socket =
       socket
       |> assign(:page_title, "Show Expense")
       |> assign(:expense, Expenses.get_expense_with_category!(id))
-      |> assign(:return_to, return_to)
 
     {:ok, socket}
   end
