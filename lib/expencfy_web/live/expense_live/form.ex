@@ -53,8 +53,6 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
   defp apply_action(socket, :edit, %{"id" => id}) do
     expense = Expenses.get_expense!(id)
 
-    IO.inspect(expense)
-
     socket
     |> assign(:page_title, "Edit Expense")
     |> assign(:expense, expense)
