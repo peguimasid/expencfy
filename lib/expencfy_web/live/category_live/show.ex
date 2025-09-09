@@ -46,15 +46,15 @@ defmodule ExpencfyWeb.CategoryLive.Show do
 
       <.header>Recent Expenses</.header>
 
-      <div :if={@category.expenses == []} class="text-gray-500 italic">
+      <div :if={@streams.expenses == []} class="text-gray-500 italic">
         No expenses found for this category.
       </div>
 
-      <.table :if={@category.expenses != []} id="expenses" rows={@category.expenses}>
-        <:col :let={expense} label="Description">{expense.description}</:col>
-        <:col :let={expense} label="Amount">{expense.amount}</:col>
-        <:col :let={expense} label="Date">{expense.date}</:col>
-        <:action :let={expense}>
+      <.table :if={@streams.expenses != []} id="expenses" rows={@streams.expenses}>
+        <:col :let={{_id, expense}} label="Description">{expense.description}</:col>
+        <:col :let={{_id, expense}} label="Amount">{expense.amount}</:col>
+        <:col :let={{_id, expense}} label="Date">{expense.date}</:col>
+        <:action :let={{_id, expense}}>
           <.link navigate={~p"/expenses/#{expense}"}>Show</.link>
         </:action>
       </.table>
@@ -64,19 +64,42 @@ defmodule ExpencfyWeb.CategoryLive.Show do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
+    if connected?(socket) do
+      Expenses.subscribe()
+    end
+
     category = Expenses.get_category_with_expenses!(id)
     total_spent = Enum.reduce(category.expenses, Money.new(0, :USD), &Money.add(&2, &1.amount))
     percent_spent = calculate_percent_spent(total_spent, category.monthly_budget)
 
-    socket =
-      assign(socket, %{
-        page_title: "Show Category",
-        category: category,
-        total_spent: total_spent,
-        percent_spent: percent_spent
-      })
+    {:ok,
+     socket
+     |> assign(:page_title, "Show Category")
+     |> assign(:category, category)
+     |> assign(:total_spent, total_spent)
+     |> assign(:percent_spent, percent_spent)
+     |> stream(:expenses, category.expenses)}
+  end
 
-    {:ok, socket}
+  @impl true
+  def handle_info({:expense_created, expense}, socket) do
+    IO.inspect(expense, label: "Expense created")
+    # {:noreply, stream_insert(socket, :expenses, expense, at: 0)}
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:expense_updated, expense}, socket) do
+    IO.inspect(expense, label: "Expense updated")
+    # {:noreply, stream_insert(socket, :expenses, expense)}
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:expense_deleted, expense}, socket) do
+    IO.inspect(expense, label: "Expense deleted")
+    # {:noreply, stream_delete(socket, :expenses, expense)}
+    {:noreply, socket}
   end
 
   defp calculate_percent_spent(total_spent, monthly_budget) do
