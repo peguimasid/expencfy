@@ -41,6 +41,14 @@ defmodule Expencfy.ExpensesTest do
       assert length(names_and_ids) == 2
     end
 
+    test "category_names_and_ids/0 returns categories ordered by name" do
+      category1 = category_fixture(%{name: "Z Category"})
+      category2 = category_fixture(%{name: "A Category"})
+
+      names_and_ids = Expenses.category_names_and_ids()
+      assert [{"A Category", category2.id}, {"Z Category", category1.id}] == names_and_ids
+    end
+
     test "create_category/1 with valid data creates a category" do
       valid_attrs = %{name: "some name", description: "some description", monthly_budget: 42}
 
@@ -85,6 +93,14 @@ defmodule Expencfy.ExpensesTest do
       category = category_fixture()
       assert %Ecto.Changeset{} = Expenses.change_category(category)
     end
+
+    test "change_category/2 returns a category changeset with given attributes" do
+      category = category_fixture()
+      attrs = %{name: "new name"}
+      changeset = Expenses.change_category(category, attrs)
+      assert %Ecto.Changeset{} = changeset
+      assert changeset.changes.name == "new name"
+    end
   end
 
   describe "expenses" do
@@ -97,6 +113,21 @@ defmodule Expencfy.ExpensesTest do
     test "list_expenses/0 returns all expenses" do
       expense = expense_fixture()
       assert Expenses.list_expenses() == [expense]
+    end
+
+    test "list_expenses_for_category/1 returns expenses for given category" do
+      category1 = category_fixture()
+      category2 = category_fixture()
+      expense1 = expense_fixture(%{category_id: category1.id})
+      expense2 = expense_fixture(%{category_id: category2.id})
+
+      expenses = Expenses.list_expenses_for_category(category1.id)
+      assert expenses == [expense1]
+      refute expense2 in expenses
+    end
+
+    test "list_expenses_for_category/1 returns empty list for non-existent category" do
+      assert Expenses.list_expenses_for_category(999) == []
     end
 
     test "get_expense!/1 returns the expense with given id" do
@@ -170,6 +201,89 @@ defmodule Expencfy.ExpensesTest do
     test "change_expense/1 returns a expense changeset" do
       expense = expense_fixture()
       assert %Ecto.Changeset{} = Expenses.change_expense(expense)
+    end
+
+    test "change_expense/2 returns a expense changeset with given attributes" do
+      expense = expense_fixture()
+      attrs = %{description: "new description"}
+      changeset = Expenses.change_expense(expense, attrs)
+      assert %Ecto.Changeset{} = changeset
+      assert changeset.changes.description == "new description"
+    end
+  end
+
+  describe "pubsub" do
+    import Expencfy.ExpensesFixtures
+
+    test "subscribe/0 subscribes to expense updates" do
+      assert :ok = Expenses.subscribe()
+    end
+
+    test "subscribe_to_categories/0 subscribes to category updates" do
+      assert :ok = Expenses.subscribe_to_categories()
+    end
+
+    test "create_category/1 broadcasts category_created message" do
+      Expenses.subscribe_to_categories()
+
+      valid_attrs = %{name: "Test Category", description: "Test", monthly_budget: 100}
+      {:ok, category} = Expenses.create_category(valid_attrs)
+
+      assert_receive {:category_created, ^category}
+    end
+
+    test "update_category/2 broadcasts category_updated message" do
+      Expenses.subscribe_to_categories()
+
+      category = category_fixture()
+      {:ok, updated_category} = Expenses.update_category(category, %{name: "Updated"})
+
+      assert_receive {:category_updated, ^updated_category}
+    end
+
+    test "delete_category/1 broadcasts category_deleted message" do
+      Expenses.subscribe_to_categories()
+
+      category = category_fixture()
+      {:ok, deleted_category} = Expenses.delete_category(category)
+
+      assert_receive {:category_deleted, ^deleted_category}
+    end
+
+    test "create_expense/1 broadcasts expense_created message" do
+      Expenses.subscribe()
+
+      category = category_fixture()
+
+      valid_attrs = %{
+        date: ~D[2025-01-01],
+        description: "Test Expense",
+        amount: 50,
+        category_id: category.id
+      }
+
+      {:ok, expense} = Expenses.create_expense(valid_attrs)
+
+      assert_receive {:expense_created, ^expense}
+    end
+
+    test "update_expense/2 broadcasts expense_updated message with preloaded category" do
+      Expenses.subscribe()
+
+      expense = expense_fixture()
+      {:ok, updated_expense} = Expenses.update_expense(expense, %{description: "Updated"})
+
+      assert_receive {:expense_updated, ^updated_expense}
+      assert updated_expense.category != nil
+    end
+
+    test "delete_expense/1 broadcasts expense_deleted message" do
+      Expenses.subscribe()
+
+      expense = expense_fixture()
+      {:ok, deleted_expense} = Expenses.delete_expense(expense)
+
+      assert_receive {:expense_deleted, ^deleted_expense}
     end
   end
 end
