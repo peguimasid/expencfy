@@ -182,6 +182,25 @@ defmodule Expencfy.Expenses do
   end
 
   @doc """
+  Returns the expenses for a given category, sorted by `inserted_at` in descending order.
+
+  ## Examples
+
+      iex> list_expenses_for_category(123)
+      [%Expense{}, ...]
+
+      iex> list_expenses_for_category(456)
+      []
+
+  """
+  def list_expenses_for_category(category_id) do
+    Expense
+    |> where([e], e.category_id == ^category_id)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single expense.
 
   Raises `Ecto.NoResultsError` if the Expense does not exist.

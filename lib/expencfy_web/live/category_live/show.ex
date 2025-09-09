@@ -68,38 +68,59 @@ defmodule ExpencfyWeb.CategoryLive.Show do
       Expenses.subscribe()
     end
 
-    category = Expenses.get_category_with_expenses!(id)
-    total_spent = Enum.reduce(category.expenses, Money.new(0, :USD), &Money.add(&2, &1.amount))
-    percent_spent = calculate_percent_spent(total_spent, category.monthly_budget)
+    category = Expenses.get_category!(id)
+    expenses = Expenses.list_expenses_for_category(id)
 
     {:ok,
      socket
      |> assign(:page_title, "Show Category")
      |> assign(:category, category)
-     |> assign(:total_spent, total_spent)
-     |> assign(:percent_spent, percent_spent)
-     |> stream(:expenses, category.expenses)}
+     |> assign_calculated_values(expenses)
+     |> stream(:expenses, expenses)}
   end
 
   @impl true
   def handle_info({:expense_created, expense}, socket) do
-    IO.inspect(expense, label: "Expense created")
-    # {:noreply, stream_insert(socket, :expenses, expense, at: 0)}
-    {:noreply, socket}
+    if expense.category_id == socket.assigns.category.id do
+      socket = stream_insert(socket, :expenses, expense, at: 0)
+      {:noreply, recalculate_totals(socket)}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
   def handle_info({:expense_updated, expense}, socket) do
-    IO.inspect(expense, label: "Expense updated")
-    # {:noreply, stream_insert(socket, :expenses, expense)}
-    {:noreply, socket}
+    if expense.category_id == socket.assigns.category.id do
+      socket = stream_insert(socket, :expenses, expense)
+      {:noreply, recalculate_totals(socket)}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
   def handle_info({:expense_deleted, expense}, socket) do
-    IO.inspect(expense, label: "Expense deleted")
-    # {:noreply, stream_delete(socket, :expenses, expense)}
-    {:noreply, socket}
+    if expense.category_id == socket.assigns.category.id do
+      socket = stream_delete(socket, :expenses, expense)
+      {:noreply, recalculate_totals(socket)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp recalculate_totals(socket) do
+    expenses = Expenses.list_expenses_for_category(socket.assigns.category.id)
+    assign_calculated_values(socket, expenses)
+  end
+
+  defp assign_calculated_values(socket, expenses) do
+    total_spent = Enum.reduce(expenses, Money.new(0, :USD), &Money.add(&2, &1.amount))
+    percent_spent = calculate_percent_spent(total_spent, socket.assigns.category.monthly_budget)
+
+    socket
+    |> assign(:total_spent, total_spent)
+    |> assign(:percent_spent, percent_spent)
   end
 
   defp calculate_percent_spent(total_spent, monthly_budget) do
