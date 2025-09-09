@@ -32,6 +32,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
               max="100"
               class={[
                 "progress w-full",
+                @percent_spent > 80 && "text-yellow-500",
                 @percent_spent >= 100 && "text-red-500"
               ]}
             />
