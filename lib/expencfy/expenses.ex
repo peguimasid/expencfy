@@ -201,6 +201,30 @@ defmodule Expencfy.Expenses do
   end
 
   @doc """
+  Returns the expenses for a given category for the current month, sorted by `inserted_at` in descending order.
+
+  ## Examples
+
+      iex> list_expenses_for_category_current_month(123)
+      [%Expense{}, ...]
+
+      iex> list_expenses_for_category_current_month(456)
+      []
+
+  """
+  def list_expenses_for_category_current_month(category_id) do
+    now = Timex.now()
+    start_of_month = Timex.beginning_of_month(now)
+    end_of_month = Timex.end_of_month(now)
+
+    Expense
+    |> where([e], e.category_id == ^category_id)
+    |> where([e], e.date >= ^start_of_month and e.date <= ^end_of_month)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single expense.
 
   Raises `Ecto.NoResultsError` if the Expense does not exist.
