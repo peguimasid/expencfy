@@ -8,6 +8,7 @@ defmodule Expencfy.Repo.Migrations.CreateExpenses do
       add :date, :date
       add :notes, :text
       add :category_id, references(:categories, on_delete: :nothing)
+      add :lock_version, :integer
 
       timestamps(type: :utc_datetime)
     end

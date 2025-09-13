@@ -7,6 +7,7 @@ defmodule Expencfy.Expenses.Expense do
     field :amount, Money.Ecto.Amount.Type
     field :date, :date
     field :notes, :string
+    field :lock_version, :integer, default: 0
     belongs_to :category, Expencfy.Expenses.Category
 
     timestamps(type: :utc_datetime)
@@ -15,9 +16,10 @@ defmodule Expencfy.Expenses.Expense do
   @doc false
   def changeset(expense, attrs) do
     expense
-    |> cast(attrs, [:description, :amount, :date, :notes, :category_id])
+    |> cast(attrs, [:description, :amount, :date, :notes, :category_id, :lock_version])
     |> validate_required([:description, :amount, :date, :category_id])
     |> validate_money(:amount)
+    |> optimistic_lock(:lock_version)
   end
 
   defp validate_money(changeset, field) do
