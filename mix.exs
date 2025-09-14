@@ -69,7 +69,8 @@ defmodule Expencfy.MixProject do
       {:bandit, "~> 1.5"},
       {:money, "~> 1.14"},
       {:timex, "~> 3.7"},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
