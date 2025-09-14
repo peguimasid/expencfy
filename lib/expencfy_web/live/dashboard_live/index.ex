@@ -162,7 +162,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                             {total_spent_by_category(@expenses, category.id)} of {category.monthly_budget}
                           </span>
                           <span>
-                            {trunc(calculate_percent_spent_by_category(@expenses, category))}%
+                            {calculate_percent_spent_by_category(@expenses, category)}%
                           </span>
                         </div>
                       </div>
