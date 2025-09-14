@@ -225,6 +225,13 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
       <div :if={@show_expense_form} class="modal backdrop-blur-xs modal-open">
         <div class="modal-box border border-base-300">
+          <button
+            type="button"
+            class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+            phx-click="close_expense_form"
+          >
+            <.icon name="hero-x-mark" class="size-5" />
+          </button>
           <h3 class="font-bold text-lg mb-4">Add New Expense</h3>
           <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
             <div class="space-y-4">
