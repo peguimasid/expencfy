@@ -1,0 +1,30 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      daisyui:
+        specifier: ^5.1.10
+        version: 5.1.10
+      tailwindcss:
+        specifier: ^4.1.13
+        version: 4.1.13
+
+packages:
+
+  daisyui@5.1.10:
+    resolution: {integrity: sha512-p1J/HME2WmaSiy6u2alIbeP3gd5PNVft3+6Bdll0BRSm/UdI4084+pD01LxFug/5wGexNewWqbcEL6nB2n2o+Q==}
+
+  tailwindcss@4.1.13:
+    resolution: {integrity: sha512-i+zidfmTqtwquj4hMEwdjshYYgMbOrPzb9a0M3ZgNa0JMoZeFC6bxZvO8yr8ozS6ix2SDz0+mvryPeBs2TFE+w==}
+
+snapshots:
+
+  daisyui@5.1.10: {}
+
+  tailwindcss@4.1.13: {}
