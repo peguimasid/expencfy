@@ -85,11 +85,7 @@ defmodule Expencfy.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": [
-        "tailwind.install --if-missing",
-        "esbuild.install --if-missing",
-        "cmd --cd assets pnpm install"
-      ],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind expencfy", "esbuild expencfy"],
       "assets.deploy": [
         "tailwind expencfy --minify",
