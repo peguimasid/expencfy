@@ -17,9 +17,7 @@ defmodule ExpencfyWeb.Router do
   scope "/", ExpencfyWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-
-    live "/dashboard", DashboardLive.Index, :index
+    live "/", DashboardLive.Index, :index
     live "/categories", CategoryLive.Index, :index
     live "/categories/new", CategoryLive.Form, :new
     live "/categories/:id", CategoryLive.Show, :show

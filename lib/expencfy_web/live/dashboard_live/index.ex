@@ -27,7 +27,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                 class="btn btn-primary gap-2"
                 phx-click="show_expense_form"
               >
-                <.icon name="hero-plus" class="h-4 w-4" /> Add Expense
+                <.icon name="hero-plus" class="size-4" /> Add Expense
               </button>
             </div>
           </div>
@@ -76,7 +76,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     </div>
                     <div class="divider my-2"></div>
                     <div class="flex items-center gap-2 text-sm">
-                      <.icon name="hero-calendar-days" class="h-4 w-4 text-base-content/70" />
+                      <.icon name="hero-calendar-days" class="size-4 text-base-content/70" />
                       <span class="text-base-content/70">
                         {Timex.format!(Timex.today(), "{Mfull} {YYYY}")}
                       </span>
@@ -94,13 +94,19 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                       navigate={~p"/categories/new"}
                       class="btn btn-secondary w-full justify-start gap-2"
                     >
-                      <.icon name="hero-plus" class="h-4 w-4" /> New Category
+                      <.icon name="hero-plus" class="size-4" /> New Category
                     </.link>
                     <.link
                       navigate={~p"/expenses"}
                       class="btn btn-secondary w-full justify-start gap-2"
                     >
-                      <.icon name="hero-document-text" class="h-4 w-4" /> View All Expenses
+                      <.icon name="hero-document-text" class="size-4" /> View All Expenses
+                    </.link>
+                    <.link
+                      navigate={~p"/categories"}
+                      class="btn btn-secondary w-full justify-start gap-2"
+                    >
+                      <.icon name="hero-queue-list" class="size-4" /> View All Categories
                     </.link>
                   </div>
                 </div>
