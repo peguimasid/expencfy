@@ -1,4 +1,5 @@
 defmodule ExpencfyWeb.DashboardLive.Index do
+  alias Expencfy.Expenses
   use ExpencfyWeb, :live_view
 
   @impl true
@@ -46,21 +47,29 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     <div class="space-y-2">
                       <div class="flex justify-between text-sm">
                         <span class="text-base-content/70">Total Spent</span>
-                        <span class="font-medium">${@total_spent}</span>
+                        <%!-- <span class="font-medium">${@total_spent}</span> --%>
+                        <span class="font-medium">$120</span>
                       </div>
                       <div class="flex justify-between text-sm">
                         <span class="text-base-content/70">Total Budget</span>
-                        <span class="font-medium">${@total_budget}</span>
+                        <%!-- <span class="font-medium">${@total_budget}</span> --%>
+                        <span class="font-medium">$320</span>
                       </div>
-                      <progress
+                      <%!-- <progress
                         class="progress progress-primary w-full"
                         value={@overall_progress}
                         max="100"
-                      >
-                      </progress>
+                      /> --%>
+                      <progress
+                        class="progress progress-primary w-full"
+                        value={95}
+                        max="100"
+                      />
                       <div class="flex justify-between text-xs text-base-content/70">
-                        <span>{@overall_progress}% used</span>
-                        <span>${@remaining_budget} remaining</span>
+                        <%!-- <span>{@overall_progress}% used</span>
+                        <span>${@remaining_budget} remaining</span> --%>
+                        <span>95% used</span>
+                        <span>$240 remaining</span>
                       </div>
                     </div>
                     <div class="divider my-2"></div>
@@ -121,23 +130,24 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                           <h3 class="font-semibold">{category.name}</h3>
                           <p class="text-sm text-base-content/70 mt-1">{category.description}</p>
                         </div>
-                        <div class={"w-3 h-3 rounded-full #{category.color}"}></div>
+                        <div class="w-3 h-3 rounded-full bg-gray-500"></div>
                       </div>
 
                       <div class="mt-4 space-y-2">
                         <div class="flex justify-between text-sm">
                           <span class="text-base-content/70">Spent</span>
-                          <span class="font-medium">${category.spent}</span>
+                          <span class="font-medium">$0</span>
+                          <%!-- <span class="font-medium">${category.spent}</span> --%>
                         </div>
-                        <progress
+                        <%!-- <progress
                           class="progress progress-primary w-full"
                           value={category.spent / category.monthly_budget * 100}
                           max="100"
-                        >
                         </progress>
+                        > --%>
                         <div class="flex justify-between text-xs text-base-content/70">
-                          <span>${category.spent} of ${category.monthly_budget}</span>
-                          <span>{trunc(category.spent / category.monthly_budget * 100)}%</span>
+                          <%!-- <span>${category.spent} of ${category.monthly_budget}</span> --%>
+                          <%!-- <span>{trunc(category.spent / category.monthly_budget * 100)}%</span> --%>
                         </div>
                       </div>
                     </div>
@@ -148,21 +158,24 @@ defmodule ExpencfyWeb.DashboardLive.Index do
     <!-- Recent Expenses -->
               <div class="card bg-base-200 shadow-sm">
                 <div class="card-body">
-                  <h2 class="card-title">Recent Expenses</h2>
+                  <h2 class="card-title">Current month overview</h2>
                   <div class="space-y-2">
                     <div
                       :for={expense <- @recent_expenses}
                       class="flex items-center justify-between p-3 bg-base-100 rounded-lg"
                     >
                       <div class="flex items-center gap-3">
-                        <div class={"w-2 h-2 rounded-full #{get_category_color(@categories, expense.category_id)}"}>
-                        </div>
                         <div>
-                          <p class="font-medium">{expense.description}</p>
+                          <p class="font-medium">
+                            {expense.description} •
+                            <span class="font-normal text-zinc-400">
+                              {expense.category.name}
+                            </span>
+                          </p>
                           <p class="text-sm text-base-content/70">{expense.date}</p>
                         </div>
                       </div>
-                      <span class="font-medium">${expense.amount}</span>
+                      <span class="font-medium">{expense.amount}</span>
                     </div>
                   </div>
                 </div>
@@ -171,112 +184,43 @@ defmodule ExpencfyWeb.DashboardLive.Index do
           </div>
         </div>
       </div>
-      
-    <!-- Expense Form Modal -->
-      <%= if @show_expense_form do %>
-        <div class="modal modal-open">
-          <div class="modal-box">
-            <h3 class="font-bold text-lg mb-4">Add New Expense</h3>
-            <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
-              <div class="space-y-4">
-                <.input field={@form[:description]} type="text" label="Description" />
-                <.input field={@form[:amount]} type="number" label="Amount" step="0.01" />
-                <.input
-                  field={@form[:category_id]}
-                  type="select"
-                  label="Category"
-                  options={category_options(@categories)}
-                />
-                <.input field={@form[:date]} type="date" label="Date" />
-                <.input field={@form[:notes]} type="textarea" label="Notes (optional)" />
-              </div>
-              <div class="modal-action">
-                <button type="button" class="btn" phx-click="close_expense_form">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Expense</button>
-              </div>
-            </.form>
-          </div>
+
+      <div :if={@show_expense_form} class="modal modal-open">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg mb-4">Add New Expense</h3>
+          <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
+            <div class="space-y-4">
+              <.input field={@form[:description]} type="text" label="Description" />
+              <.input field={@form[:amount]} type="number" label="Amount" step="0.01" />
+              <.input
+                field={@form[:category_id]}
+                type="select"
+                label="Category"
+                options={Expenses.category_names_and_ids()}
+              />
+              <.input field={@form[:date]} type="date" label="Date" />
+              <.input field={@form[:notes]} type="textarea" label="Notes (optional)" />
+            </div>
+            <div class="modal-action">
+              <button type="button" class="btn" phx-click="close_expense_form">Cancel</button>
+              <button type="submit" class="btn btn-primary">Add Expense</button>
+            </div>
+          </.form>
         </div>
-      <% end %>
+      </div>
     </div>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
-    categories = [
-      %{
-        id: "1",
-        name: "Food & Dining",
-        description: "Groceries, restaurants, and food delivery",
-        monthly_budget: 800.0,
-        spent: 456.78,
-        color: "bg-red-500"
-      },
-      %{
-        id: "2",
-        name: "Transportation",
-        description: "Gas, public transit, rideshare",
-        monthly_budget: 300.0,
-        spent: 189.5,
-        color: "bg-blue-500"
-      },
-      %{
-        id: "3",
-        name: "Entertainment",
-        description: "Movies, games, subscriptions",
-        monthly_budget: 200.0,
-        spent: 145.99,
-        color: "bg-green-500"
-      },
-      %{
-        id: "4",
-        name: "Shopping",
-        description: "Clothing, electronics, miscellaneous",
-        monthly_budget: 400.0,
-        spent: 234.67,
-        color: "bg-purple-500"
-      }
-    ]
-
-    recent_expenses = [
-      %{
-        id: "1",
-        category_id: "1",
-        description: "Grocery shopping",
-        amount: 89.45,
-        date: "2024-01-15",
-        notes: "Weekly groceries"
-      },
-      %{
-        id: "2",
-        category_id: "2",
-        description: "Gas station",
-        amount: 45.2,
-        date: "2024-01-14"
-      },
-      %{
-        id: "3",
-        category_id: "3",
-        description: "Netflix subscription",
-        amount: 15.99,
-        date: "2024-01-13"
-      }
-    ]
-
-    total_budget = Enum.reduce(categories, 0, fn cat, acc -> acc + cat.monthly_budget end)
-    total_spent = Enum.reduce(categories, 0, fn cat, acc -> acc + cat.spent end)
-    overall_progress = trunc(total_spent / total_budget * 100)
-    remaining_budget = Float.round(total_budget - total_spent, 2)
+    categories = Expenses.list_categories()
+    expenses = Expenses.list_expenses_current_month()
 
     socket =
       socket
       |> assign(:categories, categories)
-      |> assign(:recent_expenses, recent_expenses)
-      |> assign(:total_budget, Float.round(total_budget, 2))
-      |> assign(:total_spent, Float.round(total_spent, 2))
-      |> assign(:overall_progress, overall_progress)
-      |> assign(:remaining_budget, remaining_budget)
+      |> assign(:recent_expenses, expenses)
       |> assign(:selected_category, nil)
       |> assign(:show_expense_form, false)
       |> assign(:form, to_form(%{}))
@@ -299,36 +243,27 @@ defmodule ExpencfyWeb.DashboardLive.Index do
     socket =
       socket
       |> assign(:show_expense_form, false)
-      |> assign(:form, to_form({}))
+      |> assign(:form, to_form(%{}))
 
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("validate", %{"expense" => expense_params}, socket) do
+  def handle_event("validate", _params, socket) do
     # Add validation logic here if needed
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("save", %{"expense" => expense_params}, socket) do
+  def handle_event("save", expense_params, socket) do
     # Add save logic here
     IO.inspect(expense_params, label: "New expense")
 
     socket =
       socket
       |> assign(:show_expense_form, false)
-      |> assign(:form, to_form({}))
+      |> assign(:form, to_form(%{}))
 
     {:noreply, socket}
-  end
-
-  defp get_category_color(categories, category_id) do
-    category = Enum.find(categories, fn cat -> cat.id == category_id end)
-    if category, do: category.color, else: "bg-gray-500"
-  end
-
-  defp category_options(categories) do
-    Enum.map(categories, fn cat -> {cat.name, cat.id} end)
   end
 end

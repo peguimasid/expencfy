@@ -201,6 +201,27 @@ defmodule Expencfy.Expenses do
   end
 
   @doc """
+  Returns all expenses for the current month, sorted by `inserted_at` in descending order.
+
+  ## Examples
+
+      iex> list_expenses_current_month()
+      [%Expense{}, ...]
+
+  """
+  def list_expenses_current_month do
+    now = Timex.now()
+    start_of_month = Timex.beginning_of_month(now)
+    end_of_month = Timex.end_of_month(now)
+
+    Expense
+    |> where([e], e.date >= ^start_of_month and e.date <= ^end_of_month)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+    |> Repo.preload(:category)
+  end
+
+  @doc """
   Returns the expenses for a given category for the current month, sorted by `inserted_at` in descending order.
 
   ## Examples
