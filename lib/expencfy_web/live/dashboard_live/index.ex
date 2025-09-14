@@ -148,18 +148,22 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                       <div class="mt-4 space-y-2">
                         <div class="flex justify-between text-sm">
                           <span class="text-base-content/70">Spent</span>
-                          <span class="font-medium">$0</span>
-                          <%!-- <span class="font-medium">${category.spent}</span> --%>
+                          <span class="font-medium">
+                            {total_spent_by_category(@expenses, category.id)}
+                          </span>
                         </div>
-                        <%!-- <progress
-                      class="progress progress-primary w-full"
-                      value={category.spent / category.monthly_budget * 100}
-                      max="100"
-                    </progress>
-                    > --%>
+                        <progress
+                          class="progress progress-primary w-full"
+                          value={calculate_percent_spent_by_category(@expenses, category)}
+                          max="100"
+                        />
                         <div class="flex justify-between text-xs text-base-content/70">
-                          <%!-- <span>${category.spent} of ${category.monthly_budget}</span> --%>
-                          <%!-- <span>{trunc(category.spent / category.monthly_budget * 100)}%</span> --%>
+                          <span>
+                            {total_spent_by_category(@expenses, category.id)} of {category.monthly_budget}
+                          </span>
+                          <span>
+                            {trunc(calculate_percent_spent_by_category(@expenses, category))}%
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -361,6 +365,25 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
   defp calculate_remaining_budget(total_spent, monthly_budget) do
     Money.subtract(monthly_budget, total_spent)
+  end
+
+  defp total_spent_by_category(expenses, category_id) do
+    expenses
+    |> Enum.filter(&(&1.category_id == category_id))
+    |> Enum.reduce(Money.new(0, :USD), fn expense, acc ->
+      Money.add(acc, expense.amount)
+    end)
+  end
+
+  defp calculate_percent_spent_by_category(expenses, category) do
+    total_spent = total_spent_by_category(expenses, category.id)
+    budget_amount = category.monthly_budget |> Money.to_decimal() |> Decimal.to_float()
+    spent_amount = total_spent |> Money.to_decimal() |> Decimal.to_float()
+
+    case budget_amount do
+      amount when amount > 0 -> (spent_amount / amount * 100) |> Float.round(1)
+      _ -> 0.0
+    end
   end
 
   defp toggle_category_selection(current_selected, selected_id) do
