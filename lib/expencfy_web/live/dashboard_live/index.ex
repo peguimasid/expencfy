@@ -3,20 +3,21 @@ defmodule ExpencfyWeb.DashboardLive.Index do
   alias Expencfy.Expenses
   use ExpencfyWeb, :live_view
 
+  # sticky inset-0 z-10 flex h-16 w-full border-b bg-card/80 backdrop-blur-sm
   @impl true
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-base-100">
       <!-- Header -->
-      <header class="border-b border-b-base-300 bg-base-200/50 backdrop-blur">
+      <header class="border-b border-b-base-300 sticky inset-0 z-10 bg-base-200/80 backdrop-blur">
         <div class="container mx-auto px-4 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-content">
                 <.icon name="hero-currency-dollar" class="h-5 w-5" />
               </div>
-              <div>
-                <h1 class="text-2xl font-bold">Expense Tracker</h1>
+              <div class="hidden sm:inline">
+                <h1 class="text-lg font-bold">Expencfy</h1>
                 <p class="text-sm text-base-content/70">Manage your budget and expenses</p>
               </div>
             </div>
@@ -75,8 +76,10 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     </div>
                     <div class="divider my-2"></div>
                     <div class="flex items-center gap-2 text-sm">
-                      <.icon name="hero-calendar" class="h-4 w-4 text-base-content/70" />
-                      <span class="text-base-content/70">January 2024</span>
+                      <.icon name="hero-calendar-days" class="h-4 w-4 text-base-content/70" />
+                      <span class="text-base-content/70">
+                        {Timex.format!(Timex.today(), "{Mfull} {YYYY}")}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -112,7 +115,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
               <div>
                 <div class="mb-4 flex items-center justify-between">
                   <h2 class="text-xl font-semibold">Budget Categories</h2>
-                  <div class="badge badge-soft gap-1 px-2">
+                  <div class="badge badge-soft badge-primary badge-sm gap-1 py-2">
                     <span>{length(@categories)}</span>
                     <span>categories</span>
                   </div>
@@ -122,7 +125,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     :for={category <- @categories}
                     id={"category-#{category.id}"}
                     class={[
-                      "card cursor-pointer transition-all duration-200 hover:shadow-lg",
+                      "card cursor-pointer transition-all duration-200 hover:shadow-md",
                       if(@selected_category == category.id,
                         do: "bg-primary/10 border-primary",
                         else: "bg-base-200"
@@ -137,7 +140,12 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                           <h3 class="font-semibold">{category.name}</h3>
                           <p class="text-sm text-base-content/70 mt-1">{category.description}</p>
                         </div>
-                        <div class="w-3 h-3 rounded-full bg-gray-500"></div>
+                        <.link
+                          navigate={~p"/categories/#{category.id}"}
+                          class="btn btn-ghost btn-xs btn-circle"
+                        >
+                          <.icon name="hero-eye" class="size-4" />
+                        </.link>
                       </div>
 
                       <div class="mt-4 space-y-2">
@@ -147,11 +155,11 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                           <%!-- <span class="font-medium">${category.spent}</span> --%>
                         </div>
                         <%!-- <progress
-                          class="progress progress-primary w-full"
-                          value={category.spent / category.monthly_budget * 100}
-                          max="100"
-                        </progress>
-                        > --%>
+                      class="progress progress-primary w-full"
+                      value={category.spent / category.monthly_budget * 100}
+                      max="100"
+                    </progress>
+                    > --%>
                         <div class="flex justify-between text-xs text-base-content/70">
                           <%!-- <span>${category.spent} of ${category.monthly_budget}</span> --%>
                           <%!-- <span>{trunc(category.spent / category.monthly_budget * 100)}%</span> --%>
@@ -169,7 +177,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     <h2 class="card-title flex items-center gap-2">
                       <.icon name="hero-calendar-days" class="h-5 w-5" /> This Month's Expenses
                     </h2>
-                    <div class="badge badge-soft gap-1 px-2">
+                    <div class="badge badge-soft badge-primary badge-sm gap-1 py-2">
                       <span>{length(@recent_expenses)}</span>
                       <span>expenses</span>
                     </div>
@@ -189,7 +197,9 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                               • {expense.category.name}
                             </span>
                           </p>
-                          <p class="text-sm text-base-content/70">{expense.date}</p>
+                          <p class="text-sm text-base-content/70">
+                            {format_relative_date(expense.date)}
+                          </p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
@@ -210,8 +220,8 @@ defmodule ExpencfyWeb.DashboardLive.Index do
         </div>
       </div>
 
-      <div :if={@show_expense_form} class="modal modal-open">
-        <div class="modal-box">
+      <div :if={@show_expense_form} class="modal backdrop-blur-xs modal-open">
+        <div class="modal-box border border-base-300">
           <h3 class="font-bold text-lg mb-4">Add New Expense</h3>
           <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
             <div class="space-y-4">
