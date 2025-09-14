@@ -273,6 +273,10 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Expenses.subscribe()
+    end
+
     categories = Expenses.list_categories()
     expenses = Expenses.list_expenses_current_month()
 
@@ -338,6 +342,24 @@ defmodule ExpencfyWeb.DashboardLive.Index do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  @impl true
+  def handle_info({:expense_created, _expense}, socket) do
+    expenses = Expenses.list_expenses_current_month()
+    {:noreply, assign(socket, :expenses, expenses)}
+  end
+
+  @impl true
+  def handle_info({:expense_updated, _expense}, socket) do
+    expenses = Expenses.list_expenses_current_month()
+    {:noreply, assign(socket, :expenses, expenses)}
+  end
+
+  @impl true
+  def handle_info({:expense_deleted, _expense}, socket) do
+    expenses = Expenses.list_expenses_current_month()
+    {:noreply, assign(socket, :expenses, expenses)}
   end
 
   # Private helpers
