@@ -292,10 +292,12 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
   @impl true
   def handle_event("close_expense_form", _params, socket) do
+    expense = %Expense{date: Date.utc_today()}
+
     socket =
       socket
       |> assign(:show_expense_form, false)
-      |> assign(:form, to_form(%{}))
+      |> assign(:form, to_form(Expenses.change_expense(expense)))
 
     {:noreply, socket}
   end
@@ -326,6 +328,8 @@ defmodule ExpencfyWeb.DashboardLive.Index do
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
+
+  # Private helpers
 
   defp filter_expenses_by_category(expenses, nil), do: expenses
 
