@@ -21,7 +21,16 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
           type="number"
           label="Amount ($)"
         />
-        <.input field={@form[:date]} type="date" label="Date" />
+        <div class="flex flex-col gap-0.5 fieldset">
+          <div class="flex flex-row w-full justify-between">
+            <span class="label">Date</span>
+            <span class="label">{format_relative_date(@form[:date].value)}</span>
+          </div>
+          <.input
+            field={@form[:date]}
+            type="date"
+          />
+        </div>
         <.input field={@form[:notes]} type="textarea" label="Notes" />
         <.input
           field={@form[:category_id]}
@@ -114,4 +123,17 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
   defp money_to_decimal(input_value) do
     input_value
   end
+
+  defp format_relative_date(%Date{} = date) do
+    today = Timex.today()
+
+    case Timex.diff(date, today, :days) do
+      -1 -> "Yesterday"
+      0 -> "Today"
+      1 -> "Tomorrow"
+      _ -> Timex.format!(date, "{relative}", :relative)
+    end
+  end
+
+  defp format_relative_date(_), do: ""
 end
