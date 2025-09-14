@@ -49,29 +49,29 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     <div class="space-y-2">
                       <div class="flex justify-between text-sm">
                         <span class="text-base-content/70">Total Spent</span>
-                        <%!-- <span class="font-medium">${@total_spent}</span> --%>
-                        <span class="font-medium">$120</span>
+                        <span class="font-medium">{total_spent(@expenses)}</span>
                       </div>
                       <div class="flex justify-between text-sm">
                         <span class="text-base-content/70">Total Budget</span>
-                        <%!-- <span class="font-medium">${@total_budget}</span> --%>
-                        <span class="font-medium">$320</span>
+                        <span class="font-medium">{total_budget(@categories)}</span>
                       </div>
-                      <%!-- <progress
-                        class="progress progress-primary w-full"
-                        value={@overall_progress}
-                        max="100"
-                      /> --%>
                       <progress
                         class="progress progress-primary w-full"
-                        value={95}
+                        value={
+                          calculate_percent_spent(total_spent(@expenses), total_budget(@categories))
+                        }
                         max="100"
                       />
                       <div class="flex justify-between text-xs text-base-content/70">
-                        <%!-- <span>{@overall_progress}% used</span>
-                        <span>${@remaining_budget} remaining</span> --%>
-                        <span>95% used</span>
-                        <span>$240 remaining</span>
+                        <span>
+                          {calculate_percent_spent(total_spent(@expenses), total_budget(@categories))}% used
+                        </span>
+                        <span>
+                          {calculate_remaining_budget(
+                            total_spent(@expenses),
+                            total_budget(@categories)
+                          )} remaining
+                        </span>
                       </div>
                     </div>
                     <div class="divider my-2"></div>
@@ -335,6 +335,32 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
   defp filter_expenses_by_category(expenses, category_id) do
     Enum.filter(expenses, &(&1.category_id == category_id))
+  end
+
+  defp total_spent(expenses) do
+    Enum.reduce(expenses, Money.new(0, :USD), fn expense, acc ->
+      Money.add(acc, expense.amount)
+    end)
+  end
+
+  defp total_budget(categories) do
+    Enum.reduce(categories, Money.new(0, :USD), fn category, acc ->
+      Money.add(acc, category.monthly_budget)
+    end)
+  end
+
+  defp calculate_percent_spent(total_spent, monthly_budget) do
+    budget_amount = monthly_budget |> Money.to_decimal() |> Decimal.to_float()
+    total_spent = total_spent |> Money.to_decimal() |> Decimal.to_float()
+
+    case budget_amount do
+      amount when amount > 0 -> (total_spent / amount * 100) |> Float.round(1)
+      _ -> 0.0
+    end
+  end
+
+  defp calculate_remaining_budget(total_spent, monthly_budget) do
+    Money.subtract(monthly_budget, total_spent)
   end
 
   defp toggle_category_selection(current_selected, selected_id) do
