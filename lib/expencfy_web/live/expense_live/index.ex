@@ -10,6 +10,9 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
       <.header>
         Listing Expenses
         <:actions>
+          <.button navigate={~p"/"}>
+            <.icon name="hero-arrow-left" />
+          </.button>
           <.button variant="primary" navigate={~p"/expenses/new"}>
             <.icon name="hero-plus" /> New Expense
           </.button>

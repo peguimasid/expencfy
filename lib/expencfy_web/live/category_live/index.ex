@@ -10,6 +10,9 @@ defmodule ExpencfyWeb.CategoryLive.Index do
       <.header>
         Listing Categories
         <:actions>
+          <.button navigate={~p"/"}>
+            <.icon name="hero-arrow-left" />
+          </.button>
           <.button variant="primary" navigate={~p"/categories/new"}>
             <.icon name="hero-plus" /> New Category
           </.button>
