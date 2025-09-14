@@ -175,13 +175,15 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                       <.icon name="hero-calendar-days" class="h-5 w-5" /> This Month's Expenses
                     </h2>
                     <div class="badge badge-soft badge-primary badge-sm gap-1 py-2">
-                      <span>{length(@expenses)}</span>
+                      <span>
+                        {length(filter_expenses_by_category(@expenses, @selected_category))}
+                      </span>
                       <span>expenses</span>
                     </div>
                   </div>
                   <div class="space-y-2">
                     <div
-                      :for={expense <- @expenses}
+                      :for={expense <- filter_expenses_by_category(@expenses, @selected_category)}
                       class="flex items-center justify-between p-3 bg-base-100 rounded-lg relative"
                     >
                       <div class="absolute left-0 w-1 h-full bg-primary rounded-l-full" />
@@ -279,13 +281,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
   @impl true
   def handle_event("select_category", %{"id" => id}, socket) do
     selected_id = String.to_integer(id)
-
-    new_selected =
-      case socket.assigns.selected_category do
-        ^selected_id -> nil
-        _ -> selected_id
-      end
-
+    new_selected = toggle_category_selection(socket.assigns.selected_category, selected_id)
     {:noreply, assign(socket, :selected_category, new_selected)}
   end
 
@@ -314,18 +310,34 @@ defmodule ExpencfyWeb.DashboardLive.Index do
   def handle_event("save", %{"expense" => expense_params}, socket) do
     case Expenses.create_expense(expense_params) do
       {:ok, _expense} ->
+        expenses = Expenses.list_expenses_current_month()
         expense = %Expense{date: Date.utc_today()}
 
         socket =
           socket
           |> put_flash(:success, "Expense created successfully")
           |> assign(:show_expense_form, false)
+          |> assign(:expenses, expenses)
           |> assign(:form, to_form(Expenses.change_expense(expense)))
 
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
+  defp filter_expenses_by_category(expenses, nil), do: expenses
+
+  defp filter_expenses_by_category(expenses, category_id) do
+    Enum.filter(expenses, &(&1.category_id == category_id))
+  end
+
+  defp toggle_category_selection(current_selected, selected_id) do
+    if current_selected == selected_id do
+      nil
+    else
+      selected_id
     end
   end
 
