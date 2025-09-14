@@ -60,7 +60,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    expense = %Expense{}
+    expense = %Expense{date: Date.utc_today()}
 
     socket
     |> assign(:page_title, "New Expense")
@@ -107,10 +107,11 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
   defp return_path("index", _expense), do: ~p"/expenses"
   defp return_path("show", expense), do: ~p"/expenses/#{expense}"
 
+  defp money_to_decimal(%Money{} = input_value) do
+    Money.to_decimal(input_value)
+  end
+
   defp money_to_decimal(input_value) do
-    case input_value do
-      %Money{} -> Money.to_decimal(input_value)
-      _ -> input_value
-    end
+    input_value
   end
 end
