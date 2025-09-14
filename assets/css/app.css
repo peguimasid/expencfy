@@ -26,31 +26,32 @@
   default: false;
   prefersdark: true;
   color-scheme: "dark";
-  /* Updated to neutral grays without color tint, similar to shadcn dark theme */
-  --color-base-100: oklch(9% 0 0);
-  --color-base-200: oklch(14% 0 0);
-  --color-base-300: oklch(18% 0 0);
-  --color-base-content: oklch(98% 0 0);
-  --color-primary: oklch(98% 0 0);
-  --color-primary-content: oklch(9% 0 0);
-  --color-secondary: oklch(22% 0 0);
-  --color-secondary-content: oklch(98% 0 0);
-  --color-accent: oklch(22% 0 0);
-  --color-accent-content: oklch(98% 0 0);
-  --color-neutral: oklch(18% 0 0);
-  --color-neutral-content: oklch(98% 0 0);
-  /* Muted semantic colors for professional look */
-  --color-info: oklch(65% 0.08 220);
-  --color-info-content: oklch(98% 0 0);
-  --color-success: oklch(60% 0.08 150);
-  --color-success-content: oklch(98% 0 0);
-  --color-warning: oklch(70% 0.08 60);
-  --color-warning-content: oklch(15% 0 0);
-  --color-error: oklch(62% 0.08 20);
-  --color-error-content: oklch(98% 0 0);
-  --radius-selector: 0.375rem;
-  --radius-field: 0.375rem;
-  --radius-box: 0.5rem;
+  /* Applied shadcn dark theme colors - pure neutrals */
+  --color-base-100: oklch(0.145 0 0);
+  --color-base-200: oklch(0.205 0 0);
+  --color-base-300: oklch(0.269 0 0);
+  --color-base-content: oklch(0.985 0 0);
+  --color-primary: oklch(0.922 0 0);
+  --color-primary-content: oklch(0.205 0 0);
+  /* Enhanced ghost variants using shadcn secondary/accent colors */
+  --color-secondary: oklch(0.269 0 0);
+  --color-secondary-content: oklch(0.985 0 0);
+  --color-accent: oklch(0.269 0 0);
+  --color-accent-content: oklch(0.985 0 0);
+  --color-neutral: oklch(0.269 0 0);
+  --color-neutral-content: oklch(0.708 0 0);
+  /* Adapted semantic colors to work with pure neutral base */
+  --color-info: oklch(0.488 0.243 264.376);
+  --color-info-content: oklch(0.985 0 0);
+  --color-success: oklch(0.696 0.17 162.48);
+  --color-success-content: oklch(0.985 0 0);
+  --color-warning: oklch(0.769 0.188 70.08);
+  --color-warning-content: oklch(0.145 0 0);
+  --color-error: oklch(0.704 0.191 22.216);
+  --color-error-content: oklch(0.985 0 0);
+  --radius-selector: 0.65rem;
+  --radius-field: 0.65rem;
+  --radius-box: 0.65rem;
   --size-selector: 0.21875rem;
   --size-field: 0.21875rem;
   --border: 1px;
@@ -63,31 +64,32 @@
   default: true;
   prefersdark: false;
   color-scheme: "light";
-  /* Clean neutral whites and grays for light theme, matching shadcn approach */
-  --color-base-100: oklch(100% 0 0);
-  --color-base-200: oklch(96% 0 0);
-  --color-base-300: oklch(91% 0 0);
-  --color-base-content: oklch(15% 0 0);
-  --color-primary: oklch(15% 0 0);
-  --color-primary-content: oklch(98% 0 0);
-  --color-secondary: oklch(96% 0 0);
-  --color-secondary-content: oklch(15% 0 0);
-  --color-accent: oklch(96% 0 0);
-  --color-accent-content: oklch(15% 0 0);
-  --color-neutral: oklch(91% 0 0);
-  --color-neutral-content: oklch(15% 0 0);
-  /* Professional muted semantic colors for light theme */
-  --color-info: oklch(50% 0.08 220);
-  --color-info-content: oklch(98% 0 0);
-  --color-success: oklch(45% 0.08 150);
-  --color-success-content: oklch(98% 0 0);
-  --color-warning: oklch(55% 0.08 60);
-  --color-warning-content: oklch(98% 0 0);
-  --color-error: oklch(50% 0.08 20);
-  --color-error-content: oklch(98% 0 0);
-  --radius-selector: 0.375rem;
-  --radius-field: 0.375rem;
-  --radius-box: 0.5rem;
+  /* Applied shadcn light theme colors - pure whites and grays */
+  --color-base-100: oklch(1 0 0);
+  --color-base-200: oklch(0.97 0 0);
+  --color-base-300: oklch(0.922 0 0);
+  --color-base-content: oklch(0.145 0 0);
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-content: oklch(0.985 0 0);
+  /* Enhanced ghost variants using shadcn muted/accent approach */
+  --color-secondary: oklch(0.97 0 0);
+  --color-secondary-content: oklch(0.205 0 0);
+  --color-accent: oklch(0.97 0 0);
+  --color-accent-content: oklch(0.205 0 0);
+  --color-neutral: oklch(0.97 0 0);
+  --color-neutral-content: oklch(0.556 0 0);
+  /* Harmonized semantic colors with shadcn chart colors */
+  --color-info: oklch(0.646 0.222 41.116);
+  --color-info-content: oklch(1 0 0);
+  --color-success: oklch(0.6 0.118 184.704);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.828 0.189 84.429);
+  --color-warning-content: oklch(0.145 0 0);
+  --color-error: oklch(0.577 0.245 27.325);
+  --color-error-content: oklch(1 0 0);
+  --radius-selector: 0.65rem;
+  --radius-field: 0.65rem;
+  --radius-box: 0.65rem;
   --size-selector: 0.21875rem;
   --size-field: 0.21875rem;
   --border: 1px;
