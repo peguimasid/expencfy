@@ -1,4 +1,5 @@
 defmodule ExpencfyWeb.DashboardLive.Index do
+  alias Expencfy.Expenses.Expense
   alias Expencfy.Expenses
   use ExpencfyWeb, :live_view
 
@@ -86,12 +87,18 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                 <div class="card-body">
                   <h2 class="card-title">Quick Actions</h2>
                   <div class="space-y-2">
-                    <button class="btn btn-outline btn-block justify-start gap-2">
+                    <.link
+                      navigate={~p"/categories/new"}
+                      class="btn btn-secondary w-full justify-start gap-2"
+                    >
                       <.icon name="hero-plus" class="h-4 w-4" /> New Category
-                    </button>
-                    <button class="btn btn-outline btn-block justify-start gap-2">
+                    </.link>
+                    <.link
+                      navigate={~p"/expenses"}
+                      class="btn btn-secondary w-full justify-start gap-2"
+                    >
                       <.icon name="hero-document-text" class="h-4 w-4" /> View All Expenses
-                    </button>
+                    </.link>
                   </div>
                 </div>
               </div>
@@ -158,24 +165,42 @@ defmodule ExpencfyWeb.DashboardLive.Index do
     <!-- Recent Expenses -->
               <div class="card bg-base-200 shadow-sm">
                 <div class="card-body">
-                  <h2 class="card-title">Current month overview</h2>
+                  <div class="flex items-center justify-between mb-4">
+                    <h2 class="card-title flex items-center gap-2">
+                      <.icon name="hero-calendar-days" class="h-5 w-5" /> This Month's Expenses
+                    </h2>
+                    <div class="badge badge-soft gap-1 px-2">
+                      <span>{length(@recent_expenses)}</span>
+                      <span>expenses</span>
+                    </div>
+                  </div>
                   <div class="space-y-2">
                     <div
                       :for={expense <- @recent_expenses}
-                      class="flex items-center justify-between p-3 bg-base-100 rounded-lg"
+                      class="flex items-center justify-between p-3 bg-base-100 rounded-lg relative"
                     >
-                      <div class="flex items-center gap-3">
+                      <div class="absolute left-0 w-1 h-full bg-primary rounded-l-full" />
+
+                      <div class="flex items-center gap-3 ml-3">
                         <div>
                           <p class="font-medium">
-                            {expense.description} •
-                            <span class="font-normal text-zinc-400">
-                              {expense.category.name}
+                            {expense.description}
+                            <span class="font-normal hidden sm:inline text-zinc-400">
+                              • {expense.category.name}
                             </span>
                           </p>
                           <p class="text-sm text-base-content/70">{expense.date}</p>
                         </div>
                       </div>
-                      <span class="font-medium">{expense.amount}</span>
+                      <div class="flex items-center gap-2">
+                        <span class="font-medium">{expense.amount}</span>
+                        <.link
+                          navigate={~p"/expenses/#{expense.id}"}
+                          class="btn btn-ghost btn-sm"
+                        >
+                          Show
+                        </.link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -198,7 +223,16 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                 label="Category"
                 options={Expenses.category_names_and_ids()}
               />
-              <.input field={@form[:date]} type="date" label="Date" />
+              <div class="flex flex-col gap-0.5 fieldset">
+                <div class="flex flex-row w-full justify-between">
+                  <span class="label">Date</span>
+                  <span class="label">{format_relative_date(@form[:date].value)}</span>
+                </div>
+                <.input
+                  field={@form[:date]}
+                  type="date"
+                />
+              </div>
               <.input field={@form[:notes]} type="textarea" label="Notes (optional)" />
             </div>
             <div class="modal-action">
@@ -217,13 +251,15 @@ defmodule ExpencfyWeb.DashboardLive.Index do
     categories = Expenses.list_categories()
     expenses = Expenses.list_expenses_current_month()
 
+    expense = %Expense{date: Date.utc_today()}
+
     socket =
       socket
       |> assign(:categories, categories)
       |> assign(:recent_expenses, expenses)
       |> assign(:selected_category, nil)
       |> assign(:show_expense_form, false)
-      |> assign(:form, to_form(%{}))
+      |> assign(:form, to_form(Expenses.change_expense(expense)))
 
     {:ok, socket}
   end
@@ -266,4 +302,15 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
     {:noreply, socket}
   end
+
+  defp format_relative_date(%Date{} = date) do
+    case Timex.diff(date, Timex.today(), :days) do
+      -1 -> "Yesterday"
+      0 -> "Today"
+      1 -> "Tomorrow"
+      _ -> Timex.format!(date, "{relative}", :relative)
+    end
+  end
+
+  defp format_relative_date(_), do: ""
 end

@@ -45,7 +45,7 @@ defmodule ExpencfyWeb.CategoryLive.Show do
 
       <hr />
 
-      <.header>Current month expenses</.header>
+      <.header>This Month's Expenses</.header>
 
       <div :if={@streams.expenses == []} class="text-gray-500 italic">
         No expenses found for this category.
