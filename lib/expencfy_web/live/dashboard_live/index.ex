@@ -3,16 +3,16 @@ defmodule ExpencfyWeb.DashboardLive.Index do
   alias Expencfy.Expenses
   use ExpencfyWeb, :live_view
 
-  # sticky inset-0 z-10 flex h-16 w-full border-b bg-card/80 backdrop-blur-sm
   @impl true
   def render(assigns) do
     ~H"""
+    <Layouts.flash_group flash={@flash} />
     <div class="min-h-screen bg-base-100">
       <!-- Header -->
       <header class="border-b border-b-base-300 sticky inset-0 z-10 bg-base-200/80 backdrop-blur">
         <div class="container mx-auto px-4 py-4">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
+            <.link navigate={~p"/"} class="flex items-center gap-3">
               <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-content">
                 <.icon name="hero-currency-dollar" class="h-5 w-5" />
               </div>
@@ -20,7 +20,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                 <h1 class="text-lg font-bold">Expencfy</h1>
                 <p class="text-sm text-base-content/70">Manage your budget and expenses</p>
               </div>
-            </div>
+            </.link>
             <div class="flex items-center gap-2">
               <Layouts.theme_toggle />
               <button
@@ -125,11 +125,8 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                     :for={category <- @categories}
                     id={"category-#{category.id}"}
                     class={[
-                      "card cursor-pointer transition-all duration-200 hover:shadow-md",
-                      if(@selected_category == category.id,
-                        do: "bg-primary/10 border-primary",
-                        else: "bg-base-200"
-                      )
+                      "card cursor-pointer transition-all duration-200 border border-transparent hover:shadow-md bg-base-200",
+                      @selected_category == category.id && "bg-primary/10 !border-primary"
                     ]}
                     phx-click="select_category"
                     phx-value-id={category.id}
@@ -178,13 +175,13 @@ defmodule ExpencfyWeb.DashboardLive.Index do
                       <.icon name="hero-calendar-days" class="h-5 w-5" /> This Month's Expenses
                     </h2>
                     <div class="badge badge-soft badge-primary badge-sm gap-1 py-2">
-                      <span>{length(@recent_expenses)}</span>
+                      <span>{length(@expenses)}</span>
                       <span>expenses</span>
                     </div>
                   </div>
                   <div class="space-y-2">
                     <div
-                      :for={expense <- @recent_expenses}
+                      :for={expense <- @expenses}
                       class="flex items-center justify-between p-3 bg-base-100 rounded-lg relative"
                     >
                       <div class="absolute left-0 w-1 h-full bg-primary rounded-l-full" />
@@ -226,7 +223,12 @@ defmodule ExpencfyWeb.DashboardLive.Index do
           <.form for={@form} id="expense-form" phx-change="validate" phx-submit="save">
             <div class="space-y-4">
               <.input field={@form[:description]} type="text" label="Description" />
-              <.input field={@form[:amount]} type="number" label="Amount" step="0.01" />
+              <.input
+                field={@form[:amount]}
+                value={money_to_decimal(Phoenix.HTML.Form.input_value(@form, :amount))}
+                type="number"
+                label="Amount ($)"
+              />
               <.input
                 field={@form[:category_id]}
                 type="select"
@@ -266,7 +268,7 @@ defmodule ExpencfyWeb.DashboardLive.Index do
     socket =
       socket
       |> assign(:categories, categories)
-      |> assign(:recent_expenses, expenses)
+      |> assign(:expenses, expenses)
       |> assign(:selected_category, nil)
       |> assign(:show_expense_form, false)
       |> assign(:form, to_form(Expenses.change_expense(expense)))
@@ -276,7 +278,15 @@ defmodule ExpencfyWeb.DashboardLive.Index do
 
   @impl true
   def handle_event("select_category", %{"id" => id}, socket) do
-    {:noreply, assign(socket, :selected_category, id)}
+    selected_id = String.to_integer(id)
+
+    new_selected =
+      case socket.assigns.selected_category do
+        ^selected_id -> nil
+        _ -> selected_id
+      end
+
+    {:noreply, assign(socket, :selected_category, new_selected)}
   end
 
   @impl true
@@ -295,22 +305,36 @@ defmodule ExpencfyWeb.DashboardLive.Index do
   end
 
   @impl true
-  def handle_event("validate", _params, socket) do
-    # Add validation logic here if needed
-    {:noreply, socket}
+  def handle_event("validate", %{"expense" => expense_params}, socket) do
+    changeset = Expenses.change_expense(%Expense{}, expense_params)
+    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
   @impl true
-  def handle_event("save", expense_params, socket) do
-    # Add save logic here
-    IO.inspect(expense_params, label: "New expense")
+  def handle_event("save", %{"expense" => expense_params}, socket) do
+    case Expenses.create_expense(expense_params) do
+      {:ok, _expense} ->
+        expense = %Expense{date: Date.utc_today()}
 
-    socket =
-      socket
-      |> assign(:show_expense_form, false)
-      |> assign(:form, to_form(%{}))
+        socket =
+          socket
+          |> put_flash(:success, "Expense created successfully")
+          |> assign(:show_expense_form, false)
+          |> assign(:form, to_form(Expenses.change_expense(expense)))
 
-    {:noreply, socket}
+        {:noreply, socket}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
+  defp money_to_decimal(%Money{} = input_value) do
+    Money.to_decimal(input_value)
+  end
+
+  defp money_to_decimal(input_value) do
+    input_value
   end
 
   defp format_relative_date(%Date{} = date) do
