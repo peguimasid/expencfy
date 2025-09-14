@@ -5,6 +5,6 @@
     "tailwindcss": "^4.1.13"
   },
   "scripts": {
-    "deploy": "cd .. && mix assets.deploy && rm -f _build/esbuild*"
+    "deploy": "cd .. && pnpm install && mix assets.deploy && rm -f _build/esbuild*"
   }
 }
