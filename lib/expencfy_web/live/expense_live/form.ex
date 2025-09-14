@@ -125,9 +125,7 @@ defmodule ExpencfyWeb.ExpenseLive.Form do
   end
 
   defp format_relative_date(%Date{} = date) do
-    today = Timex.today()
-
-    case Timex.diff(date, today, :days) do
+    case Timex.diff(date, Timex.today(), :days) do
       -1 -> "Yesterday"
       0 -> "Today"
       1 -> "Tomorrow"
