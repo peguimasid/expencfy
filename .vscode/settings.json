@@ -4,5 +4,9 @@
     "expencfy",
     "postgres",
     "postgresql"
-  ]
+  ],
+  "files.exclude": {
+    "**/_build": true,
+    "**/.elixir_ls": true
+  }
 }
