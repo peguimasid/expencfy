@@ -1,7 +1,8 @@
 defmodule ExpencfyWeb.DashboardLive.Index do
-  alias Expencfy.Expenses.Expense
-  alias Expencfy.Expenses
   use ExpencfyWeb, :live_view
+
+  alias Expencfy.Expenses
+  alias Expencfy.Expenses.Expense
 
   @impl true
   def render(assigns) do

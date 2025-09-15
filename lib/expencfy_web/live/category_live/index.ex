@@ -51,7 +51,7 @@ defmodule ExpencfyWeb.CategoryLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Listing Categories")
-     |> stream(:categories, list_categories())}
+     |> stream(:categories, Expenses.list_categories())}
   end
 
   @impl true
@@ -60,9 +60,5 @@ defmodule ExpencfyWeb.CategoryLive.Index do
     {:ok, _} = Expenses.delete_category(category)
 
     {:noreply, stream_delete(socket, :categories, category)}
-  end
-
-  defp list_categories() do
-    Expenses.list_categories()
   end
 end

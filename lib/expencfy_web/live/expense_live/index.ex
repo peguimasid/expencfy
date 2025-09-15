@@ -58,7 +58,7 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Listing Expenses")
-     |> stream(:expenses, list_expenses())}
+     |> stream(:expenses, Expenses.list_expenses())}
   end
 
   @impl true
@@ -81,9 +81,5 @@ defmodule ExpencfyWeb.ExpenseLive.Index do
     expense = Expenses.get_expense!(id)
     {:ok, _} = Expenses.delete_expense(expense)
     {:noreply, socket}
-  end
-
-  defp list_expenses() do
-    Expenses.list_expenses()
   end
 end

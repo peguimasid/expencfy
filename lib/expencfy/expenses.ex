@@ -4,9 +4,9 @@ defmodule Expencfy.Expenses do
   """
 
   import Ecto.Query, warn: false
-  alias Expencfy.Repo
 
-  alias Expencfy.Expenses.{Expense, Category}
+  alias Expencfy.Repo
+  alias Expencfy.Expenses.{Category, Expense}
 
   @expense_topic "expenses:updates"
   @category_topic "categories:updates"
